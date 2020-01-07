@@ -1,0 +1,22 @@
+{% extends 'layout.html' %} {% block body %}
+<h1>Search</h1>
+
+<form method="POST" action="">
+  <div class="form-group">
+    <input type="text" name="title" placeholder="Enter Book Title" />
+  </div>
+  <div class="form-group">
+    <input type="text" name="author" placeholder="Enter Author's Name" />
+  </div>
+  <div class="form-group">
+    <input type="text" name="isbn" placeholder="Enter ISBN" />
+  </div>
+
+  <p><input type="submit" class="btn btn-primary" value="Submit" /></p>
+</form>
+<div class="results">
+  {%if results != None %} {% for result in results %}
+  <p>{{ result.title }} , {{ result.author }} , {{ result.isbn }}</p>
+  {% endfor %} {% endif %}
+</div>
+{% endblock %}

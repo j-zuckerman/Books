@@ -59,8 +59,23 @@ def login():
             # Passed
             session['logged_in'] = True
             session['username'] = name
-            return redirect(url_for('index'))
+            return redirect(url_for('search'))
         else:
             return render_template("error.html")  
 
     return render_template("login.html")      
+
+@app.route('/search', methods = ['POST', 'GET'])
+def search():
+    form = request.form
+    results = None
+    if request.method == 'POST':
+        title = form.get("title")
+        author = form.get("author")
+        isbn = form.get("isbn")
+
+        results = db.execute('Select * from books WHERE title =:title AND author =:author AND isbn =:isbn', 
+        {'title': title, 'author': author, 'isbn':isbn}).fetchall()
+
+
+    return render_template("search.html", results =results)
