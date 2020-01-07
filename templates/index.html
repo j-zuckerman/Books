@@ -1,5 +1,7 @@
+{% extends 'layout.html' %} {% block body %}
 <div class="books">
   {% for book in books %}
   <p>{{ book.title }} , {{ book.author }}</p>
   {% endfor %}
 </div>
+{% endblock %}
