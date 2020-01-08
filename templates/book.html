@@ -1,0 +1,18 @@
+{% extends 'layout.html' %} {% block body %}
+<h1>Book</h1>
+<p>{{book.title}}, {{book.author}}, {{book.year}}</p>
+
+{%if full_review != None %}
+<p>Rating: {{full_review.rating}} , review: {{full_review.review}}</p>
+{% endif %}
+<form method="POST" action="">
+  <div class="form-group">
+    <input type="number" name="rating" placeholder="Enter Rating" />
+  </div>
+  <div class="form-group">
+    <input type="text" name="review" placeholder="Enter Review" />
+  </div>
+
+  <p><input type="submit" class="btn btn-primary" value="Submit" /></p>
+</form>
+{% endblock %}

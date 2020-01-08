@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, request, session, render_template, flash, redirect, url_for,logging
+from flask import Flask, request, session, jsonify, render_template, flash, redirect, url_for,logging
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -79,3 +79,48 @@ def search():
 
 
     return render_template("search.html", results =results)
+
+@app.route('/book/<string:isbn>', methods = ['POST', 'GET'])
+def book(isbn):
+   
+    form = request.form
+    if request.method == 'POST':
+        rating = form.get('rating')
+        review = form.get('review')
+        book_id = book.id
+        db.execute("INSERT INTO reviews(rating, review, book_id) VALUES(:rating, :review, :book_id)",{"rating": rating, "review": review, "book_id": book_id})
+        db.commit()
+
+    return render_template("book.html", book = book)
+
+@app.route('/api/<string:isbn>')
+def book_api(isbn):
+    """Return details about a single book."""
+    bookInformation = db.execute('SELECT * FROM books WHERE isbn =:isbn', {'isbn': isbn}).fetchone()
+    
+    if bookInformation is None:
+        return jsonify({"error": "Invalid isbn"}), 422
+
+    book_id = bookInformation.id
+    bookReviews = db.execute('Select rating, review FROM reviews WHERE book_id =:book_id ',{'book_id': book_id}).fetchall()
+    
+    #Calculate average rating and gather all reviews 
+    rating_sum = 0
+    average_rating = None
+    reviews = []
+    if len(bookReviews) > 0:
+        for bookReview in bookReviews:
+            rating_sum += bookReview.rating
+            reviews.append(bookReview.review)
+    
+        average_rating = rating_sum/len(bookReviews)
+
+    return jsonify({
+              "title": bookInformation.title,
+              "author": bookInformation.author,
+              "year": bookInformation.year,
+              "isbn": bookInformation.isbn,
+              "reviews": reviews,
+              "average_rating": average_rating
+          })
+   

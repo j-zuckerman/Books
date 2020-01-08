@@ -16,7 +16,9 @@
 </form>
 <div class="results">
   {%if results != None %} {% for result in results %}
-  <p>{{ result.title }} , {{ result.author }} , {{ result.isbn }}</p>
+  <a href="book/{{result.isbn}}"
+    >{{ result.title }} , {{ result.author }} , {{ result.isbn }}</a
+  >
   {% endfor %} {% endif %}
 </div>
 {% endblock %}
