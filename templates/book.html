@@ -1,10 +1,11 @@
 {% extends 'layout.html' %} {% block body %}
-<h1>Book</h1>
-<p>{{book.title}}, {{book.author}}, {{book.year}}</p>
-
-{%if full_review != None %}
-<p>Rating: {{full_review.rating}} , review: {{full_review.review}}</p>
-{% endif %}
+<h3>{{book.title}}</h3>
+<h4>Author: {{book.author}}, Release Year: {{book.year}}</h4>
+<h4>Average Rating: {{book.average_rating}}</h4>
+<h3>Reviews:</h3>
+{% for book_review in book.reviews %}
+<h4>{{ book_review }}</h4>
+{% endfor %}
 <form method="POST" action="">
   <div class="form-group">
     <input type="number" name="rating" placeholder="Enter Rating" />

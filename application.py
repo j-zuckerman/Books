@@ -1,4 +1,5 @@
 import os
+import requests
 
 from flask import Flask, request, session, jsonify, render_template, flash, redirect, url_for,logging
 from flask_session import Session
@@ -83,15 +84,22 @@ def search():
 @app.route('/book/<string:isbn>', methods = ['POST', 'GET'])
 def book(isbn):
    
+    res = requests.get("http://localhost:5000/api/%s" % isbn)
+    goodReadsRes = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "ByIHq0mOFio269JypMnkTg", "isbns": isbn})
+    data = res.json()
+    goodReadsData = goodReadsRes.json()
+    print(data)
+    print(goodReadsData)
+
     form = request.form
     if request.method == 'POST':
         rating = form.get('rating')
         review = form.get('review')
-        book_id = book.id
+        book_id = data.book_id
         db.execute("INSERT INTO reviews(rating, review, book_id) VALUES(:rating, :review, :book_id)",{"rating": rating, "review": review, "book_id": book_id})
         db.commit()
 
-    return render_template("book.html", book = book)
+    return render_template("book.html", book = data)
 
 @app.route('/api/<string:isbn>')
 def book_api(isbn):
@@ -99,7 +107,7 @@ def book_api(isbn):
     bookInformation = db.execute('SELECT * FROM books WHERE isbn =:isbn', {'isbn': isbn}).fetchone()
     
     if bookInformation is None:
-        return jsonify({"error": "Invalid isbn"}), 422
+        return jsonify({"error": "Invalid isbn"}), 404
 
     book_id = bookInformation.id
     bookReviews = db.execute('Select rating, review FROM reviews WHERE book_id =:book_id ',{'book_id': book_id}).fetchall()
@@ -116,6 +124,7 @@ def book_api(isbn):
         average_rating = rating_sum/len(bookReviews)
 
     return jsonify({
+            "book_id": bookInformation.id,
               "title": bookInformation.title,
               "author": bookInformation.author,
               "year": bookInformation.year,
